@@ -1,7 +1,9 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, request
 from frps_parser import FrpsDirectory
 import threading
 import time
+from database_manager import DatabaseManager
+from routes.nodes import nodes_bp
 
 # Configurations
 FRPS_DASHBOARD_URL = 'http://204.10.194.164:7500'  # Change as needed
@@ -10,6 +12,36 @@ FRPS_DASHBOARD_PWD = "admin123"  # Set if dashboard authentication is enabled
 REFRESH_INTERVAL = 5  # seconds
 
 directory = FrpsDirectory(FRPS_DASHBOARD_URL, FRPS_DASHBOARD_USER, FRPS_DASHBOARD_PWD)
+
+db = DatabaseManager()
+
+db.execute_query('''
+            CREATE TABLE IF NOT EXISTS movies (
+                id INTEGER PRIMARY KEY,
+                title TEXT,
+                year INTEGER
+                imdb_id TEXT
+            )
+            ''')
+
+db.execute_query('''
+            CREATE TABLE IF NOT EXISTS nodes (
+                id INTEGER PRIMARY KEY,
+                name TEXT,
+                hostname TEXT,
+                status TEXT,
+                last_seen datetime
+            )
+            ''')
+
+db.execute_query('''
+            CREATE TABLE IF NOT EXISTS movie_nodes (
+                movie_id INT REFERENCES movies(id),
+                node_id INT REFERENCES nodes(id),
+                PRIMARY KEY (movie_id, node_id)
+            )
+            ''')
+
 
 def update_clients_loop():
     while True:
@@ -22,6 +54,8 @@ def update_clients_loop():
 threading.Thread(target=update_clients_loop, daemon=True).start()
 
 app = Flask(__name__)
+
+app.register_blueprint(nodes_bp)
 
 TEMPLATE = '''
 <!DOCTYPE html>
