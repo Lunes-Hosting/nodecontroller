@@ -1,4 +1,4 @@
-import requests
+from security import safe_requests
 
 class FrpsDirectory:
     def __init__(self, dashboard_url, user=None, password=None):
@@ -10,7 +10,7 @@ class FrpsDirectory:
     def fetch_online_clients(self):
         url = f"{self.dashboard_url}/api/proxy/http"
         auth = (self.user, self.password) if self.user and self.password else None
-        resp = requests.get(url, auth=auth, timeout=5)
+        resp = safe_requests.get(url, auth=auth, timeout=5)
         resp.raise_for_status()
         data = resp.json()
         self._parse_clients(data)
