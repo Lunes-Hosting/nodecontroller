@@ -13,20 +13,47 @@ def list_trusted_nodes():
 @nodes_bp.route('/add', methods=['POST'])
 def add_node():
     data = request.json
-    
+
     # Validate required fields
-    required_fields = ['name', 'name', 'hostname', 'disk_available']
+    required_fields = ['name', 'hostname', 'disk_available']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
-    
-    # Insert the node
-    query = "INSERT INTO nodes (name, hostname, 'disk_available', 'status, last_seen) VALUES (?, ?, ?, ?, ?)"
-    values = (data['name'], data['hostname'], data['disk_available'], "down", None)
-    
+
+    # Prepare query (let 'id' auto-increment)
+    query = """
+        INSERT INTO nodes (name, hostname, disk_available, status, last_seen)
+        VALUES (?, ?, ?, ?, ?)
+    """
+    values = (
+        data['name'],
+        data['hostname'],
+        data['disk_available'],
+        "down",  # default status
+        None     # default last_seen
+    )
+
     try:
-        db.execute_query(query, values)
-        return jsonify({"message": "Node added successfully"}), 201
+        conn, cursor = db.get_connection()
+        cursor.execute(query, values)
+        node_id = cursor.lastrowid
+        conn.commit()
+        return jsonify({"message": "Node added successfully", "id": node_id}), 201
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+    
+@nodes_bp.route('/keep_alive', methods=['POST'])
+def keep_alive():
+    data = request.json
+    id = data.get('id')
+    db.execute_query(
+        "UPDATE nodes SET last_seen = datetime('now'), status = 'active' WHERE id = ?",
+        (id,)
+    )
+
+    return jsonify({"message": "Node updated successfully"}), 200
+
+
 
