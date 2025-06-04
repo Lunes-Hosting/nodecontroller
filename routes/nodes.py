@@ -4,6 +4,10 @@ from database_manager import DatabaseManager as db
 # Create the blueprint
 nodes_bp = Blueprint('nodes', __name__)
 
+def make_private_key(length=32):
+    import secrets
+    return secrets.token_hex(length)
+
 @nodes_bp.route('/list', methods=['GET'])
 def list_trusted_nodes():
     rows = db.execute_query('SELECT * FROM nodes', fetch_all=True)
