@@ -21,8 +21,7 @@ class DatabaseManager():
             tuple: (connection, cursor)
         """
         connection = sqlite3.connect(database)
-        # Enable returning rows as dictionaries if needed
-        # connection.row_factory = sqlite3.Row
+        connection.row_factory = sqlite3.Row  # ✅ This enables dictionary-like rows
         cursor = connection.cursor()
         return connection, cursor
 

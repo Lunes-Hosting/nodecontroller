@@ -24,11 +24,16 @@ db.execute_query('''
             )
             ''')
 
+#example query
+"""INSERT INTO nodes (name, hostname, disk_available, status, last_seen) 
+VALUES ('Node-Server-1', 'server1.example.com', 100000, 'active', datetime('now'));
+"""
 db.execute_query('''
             CREATE TABLE IF NOT EXISTS nodes (
                 id INTEGER PRIMARY KEY,
                 name TEXT,
                 hostname TEXT,
+                disk_available INTEGER,
                 status TEXT,
                 last_seen datetime
             )
@@ -55,7 +60,7 @@ threading.Thread(target=update_clients_loop, daemon=True).start()
 
 app = Flask(__name__)
 
-app.register_blueprint(nodes_bp)
+app.register_blueprint(nodes_bp, url_prefix='/nodes')
 
 TEMPLATE = '''
 <!DOCTYPE html>
