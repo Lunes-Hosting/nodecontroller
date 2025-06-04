@@ -40,32 +40,6 @@ def add_node():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@nodes_bp.route('/update/<int:node_id>', methods=['PUT'])
-def update_node(node_id):
-    data = request.json
-    
-    # Build update query based on provided fields
-    update_fields = []
-    values = []
-    
-    for field in ['name', 'ip_address', 'port', 'status']:
-        if field in data:
-            update_fields.append(f"{field} = ?")
-            values.append(data[field])
-    
-    if not update_fields:
-        return jsonify({"error": "No fields to update"}), 400
-    
-    # Add node_id to values
-    values.append(node_id)
-    
-    query = f"UPDATE nodes SET {', '.join(update_fields)} WHERE id = ?"
-    
-    try:
-        db.execute_query(query, tuple(values))
-        return jsonify({"message": "Node updated successfully"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @nodes_bp.route('/delete/<int:node_id>', methods=['DELETE'])
 def delete_node(node_id):
