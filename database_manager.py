@@ -32,24 +32,7 @@ class DatabaseManager():
         values: Optional[tuple] = None,
         database: str = DATABASE,
         fetch_all: bool = False
-    ) -> Optional[Union[Tuple, List[Tuple]]]:
-        """
-        Executes a database query. For SELECT queries returns results, otherwise returns None.
-        
-        Args:
-            query: SQL query to execute
-            values: Query parameter values
-            database: Target database file path
-            fetch_all: Whether to return all results for SELECT queries
-            
-        Returns:
-            tuple: First row for SELECT queries when fetch_all=False
-            list[tuple]: All rows for SELECT queries when fetch_all=True
-            None: For non-SELECT queries
-            
-        Raises:
-            Exception: If database error occurs
-        """
+    ) -> Optional[Union[Tuple, List[Tuple], int]]:
         connection = None
         cursor = None
         try:
@@ -67,8 +50,10 @@ class DatabaseManager():
                     result = cursor.fetchone()
                 return result
                 
+            # For INSERT/UPDATE/DELETE return affected rows
+            affected_rows = cursor.rowcount
             connection.commit()
-            return None
+            return affected_rows
             
         except Exception as e:
             if connection:

@@ -35,7 +35,8 @@ db.execute_query('''
                 hostname TEXT,
                 disk_available INTEGER,
                 status TEXT,
-                last_seen datetime
+                last_seen datetime,
+                private_key TEXT
             )
             ''')
 

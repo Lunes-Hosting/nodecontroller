@@ -18,5 +18,5 @@ def keep_alive(id):
     response = requests.post(url, json=data)
     return response.json()
 
-print(add_node("Node-Server-1", "server1.example.com", 100000))
+# print(add_node("Node-Server-1", "server1.example.com", 100000))
 print(keep_alive(1))
