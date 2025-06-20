@@ -7,7 +7,7 @@ def add_node(name, hostname, disk_available):
         "hostname": hostname,
         "disk_available": disk_available  # in MB or GB depending on your design
     }
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data, timeout=60)
     return response.json()
 
 def keep_alive(id):
@@ -15,7 +15,7 @@ def keep_alive(id):
     data = {
         "id": id
     }
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data, timeout=60)
     return response.json()
 
 # print(add_node("Node-Server-1", "server1.example.com", 100000))
